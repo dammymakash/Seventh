@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz App with Rewards</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f8fb;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .quiz-container {
+      background: #fff;
+      margin-top: 50px;
+      padding: 30px 40px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+      max-width: 400px;
+      width: 100%;
+    }
+    .quiz-header {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .question {
+      font-size: 1.2em;
+      margin-bottom: 15px;
+    }
+    .options {
+      list-style: none;
+      padding: 0;
+    }
+    .options li {
+      margin-bottom: 10px;
+    }
+    .options button {
+      width: 100%;
+      padding: 10px;
+      font-size: 1em;
+      border: 1px solid #00b894;
+      border-radius: 6px;
+      background: #e9f8f3;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .options button:hover {
+      background: #00b894;
+      color: #fff;
+    }
+    .reward {
+      margin: 20px 0 10px 0;
+      font-size: 1.1em;
+      color: #09804b;
+      text-align: center;
+    }
+    .result {
+      text-align: center;
+      font-size: 1.2em;
+      margin-top: 20px;
+    }
+    .restart-btn {
+      display: block;
+      margin: 0 auto;
+      padding: 10px 20px;
+      font-size: 1em;
+      background: #00b894;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .restart-btn:hover {
+      background: #008f64;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <div class="quiz-header">
+      <h2>Quiz & Earn Rewards!</h2>
+    </div>
+    <div class="reward" id="rewardBox">Reward: 0 points</div>
+    <div id="quiz">
+      <!-- Quiz content will be injected here -->
+    </div>
+    <div class="result" id="resultBox"></div>
+    <button class="restart-btn" id="restartBtn" style="display:none;">Restart Quiz</button>
+  </div>
+  <script>
+    // Sample Questions
+    const questions = [
+      {
+        question: "What is the capital of France?",
+        options: ["Berlin", "London", "Paris", "Rome"],
+        answer: 2,
+        reward: 10
+      },
+      {
+        question: "Which language runs in a web browser?",
+        options: ["Python", "Java", "C", "JavaScript"],
+        answer: 3,
+        reward: 10
+      },
+      {
+        question: "What does HTML stand for?",
+        options: [
+          "Hyper Trainer Marking Language",
+          "Hyper Text Markup Language",
+          "Hyper Text Marketing Language",
+          "Hyper Tool Multi Language"
+        ],
+        answer: 1,
+        reward: 10
+      },
+      {
+        question: "Which planet is known as the Red Planet?",
+        options: ["Earth", "Mars", "Jupiter", "Venus"],
+        answer: 1,
+        reward: 10
+      },
+      {
+        question: "Who wrote 'Romeo and Juliet'?",
+        options: ["Charles Dickens", "William Shakespeare", "Mark Twain", "Jane Austen"],
+        answer: 1,
+        reward: 10
+      }
+    ];
+
+    let currentQuestion = 0;
+    let totalReward = 0;
+
+    const quiz = document.getElementById('quiz');
+    const rewardBox = document.getElementById('rewardBox');
+    const resultBox = document.getElementById('resultBox');
+    const restartBtn = document.getElementById('restartBtn');
+
+    function showQuestion(index) {
+      const q = questions[index];
+      let html = `
+        <div class="question">${q.question}</div>
+        <ul class="options">
+      `;
+      q.options.forEach((opt, i) => {
+        html += `<li><button onclick="selectOption(${i})">${opt}</button></li>`;
+      });
+      html += `</ul>`;
+      quiz.innerHTML = html;
+      resultBox.textContent = '';
+    }
+
+    // Expose selectOption to global for HTML onClick
+    window.selectOption = function(selected) {
+      const q = questions[currentQuestion];
+      if (selected === q.answer) {
+        totalReward += q.reward;
+        resultBox.textContent = 'Correct! +'+q.reward+' points 🎉';
+      } else {
+        resultBox.textContent = 'Wrong! No reward this time.';
+      }
+      updateReward();
+      setTimeout(() => {
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+          showQuestion(currentQuestion);
+        } else {
+          finishQuiz();
+        }
+      }, 1000);
+    }
+
+    function updateReward() {
+      rewardBox.textContent = `Reward: ${totalReward} points`;
+    }
+
+    function finishQuiz() {
+      quiz.innerHTML = '';
+      resultBox.innerHTML = `<strong>Quiz completed!</strong><br>Your total reward: <span style="color:#00b894;">${totalReward} points</span>`;
+      restartBtn.style.display = 'block';
+    }
+
+    restartBtn.onclick = function() {
+      currentQuestion = 0;
+      totalReward = 0;
+      updateReward();
+      showQuestion(currentQuestion);
+      resultBox.textContent = '';
+      restartBtn.style.display = 'none';
+    };
+
+    // Init
+    updateReward();
+    showQuestion(currentQuestion);
+  </script>
+</body>
+</html>
